@@ -1,39 +1,52 @@
+<div align="center">
+
 # @omadia/plugin-llm-minimax
 
-Adds MiniMax models (flagship MiniMax-M3, 1M-token context) as an LLM you can assign to any agent in omadia.
+### Run your omadia agents on MiniMax, including the 1M-context MiniMax-M3.
 
-omadia is a self-hostable agentic OS: you build, run, and audit multi-agent AI teams from signed plugins, and you bring your own LLM key. Main repo: [byte5ai/omadia](https://github.com/byte5ai/omadia). This plugin makes MiniMax one of the providers an operator can pick on the admin Providers page.
+A signed omadia plugin that adds MiniMax as a provider you pick on the admin Providers page. Declarative: no runtime code, the model catalog ships in the manifest.
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-black.svg)](LICENSE)
+[![Built for omadia](https://img.shields.io/badge/built%20for-omadia-2496ED.svg)](https://github.com/byte5ai/omadia)
+[![TypeScript](https://img.shields.io/badge/built%20with-TypeScript-3178C6.svg?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+
+[**Main repo**](https://github.com/byte5ai/omadia) · [**Website**](https://omadia.ai) · [**Plugin hub**](https://hub.omadia.ai) · [**Models**](#models) · [**Install**](#install)
+
+🇩🇪 Diese Anleitung gibt es auch [auf Deutsch](./README.de.md).
+
+</div>
+
+---
+
+omadia is a self-hostable agentic OS: compose multi-agent teams from signed plugins, run them on your own machine, and get an auditable trail for every action. This plugin makes MiniMax one of the LLM providers those agents can run on. Main repo: [byte5ai/omadia](https://github.com/byte5ai/omadia).
 
 ## Models
 
 | Model | Class | Context |
-|-------|-------|--------:|
+| --- | --- | --- |
 | MiniMax M3 | frontier | 1,048,576 |
 | MiniMax M2.5 | balanced | 204,800 |
 | MiniMax M2.5 (high-speed) | fast | 204,800 |
 
-Agents request a class (`fast` / `balanced` / `frontier`). omadia resolves the class to the concrete model.
+Agents ask for a class (`fast`, `balanced`, `frontier`). omadia maps the class to the model, so an agent never hard-codes one.
 
 ## How it works in omadia
 
-This is a declarative provider, so it ships no runtime provider code. The `llm_provider` block in `manifest.yaml` (id, base URL, models, API quirks) is read by the omadia kernel when the plugin loads, before any agent activates, and registered into the kernel's provider catalog. MiniMax uses the OpenAI-compatible Chat Completions API, so omadia's built-in OpenAI-compatible adapter drives the calls. The manifest declares the MiniMax wire quirks (the modern `max_completion_tokens` field, reasoning split) so requests stay valid.
+A declarative provider plugin, so it ships no runtime provider code. The omadia kernel reads the `llm_provider` block from `manifest.yaml` when the plugin loads, before any agent activates, and registers it in the provider catalog. MiniMax speaks an OpenAI-compatible wire format, so omadia drives it through its built-in OpenAI-compatible adapter. The manifest declares MiniMax's wire quirks (the modern `max_completion_tokens` field, the reasoning split) so requests stay valid.
 
 ## Install
 
-Install from the omadia hub at [hub.omadia.ai](https://hub.omadia.ai) (omadia admin, plugins, install), or upload the built ZIP directly.
-
-After install:
-
-1. On the admin Providers page, paste your MiniMax API key. It is stored encrypted under `provider:minimax/api_key`.
-2. Assign MiniMax and a model to an agent.
+1. Install from the [plugin hub](https://hub.omadia.ai) in the omadia admin UI (Store, Upload), or drop the built ZIP in directly.
+2. On the admin Providers page, paste your MiniMax API key. omadia stores it encrypted in the vault under `provider:minimax/api_key`.
+3. Assign MiniMax and a model to an agent: the orchestrator, a sub-agent, or the verifier.
 
 ## Configuration
 
 | Setup field | Required | Default | Notes |
-|-------------|:--------:|---------|-------|
-| `minimax_base_url` | no | `https://api.minimax.io/v1` | International endpoint. Operators in China use `https://api.minimaxi.com/v1`. |
+| --- | :---: | --- | --- |
+| `minimax_base_url` | no | `https://api.minimax.io/v1` | Operators in China use `https://api.minimaxi.com/v1`. |
 
-The API key is set centrally on the Providers page, not as a per-plugin secret.
+The key is set centrally on the Providers page, not per plugin, so the orchestrator reads it from the shared vault scope.
 
 ## Build from source
 
@@ -43,8 +56,8 @@ npm run build   # tsc, emits dist/
 npm test        # validates manifest.yaml against core's invariants
 ```
 
-The plugin compiles against omadia workspace packages (`@omadia/plugin-api`, `@omadia/llm-provider`), declared as optional peer deps. Link them from a local omadia checkout before building. See [byte5ai/omadia](https://github.com/byte5ai/omadia).
+`@omadia/plugin-api` and `@omadia/llm-provider` are provided by the omadia host at runtime (optional peer deps). Link them from a local omadia checkout to build. See [byte5ai/omadia](https://github.com/byte5ai/omadia) for the layout.
 
 ## License
 
-MIT, byte5 GmbH
+[MIT](LICENSE), byte5 GmbH
