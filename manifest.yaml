@@ -1,0 +1,106 @@
+schema_version: "1"
+
+identity:
+  id: "@omadia/plugin-llm-minimax"
+  name: "MiniMax LLM Provider"
+  version: "0.1.0"
+  kind: "provider"
+  domain: "llm.provider.minimax"
+  description: "Macht MiniMax (Flagship MiniMax-M3, 1M-Kontext) als admin-wählbaren, OpenAI-kompatiblen LLM-Provider in omadia verfügbar. Deklarativer Provider — wird aus diesem Manifest registriert, ohne Laufzeit-Provider-Code."
+  authors:
+    - name: "byte5 GmbH"
+      email: "info@omadia.ai"
+      url: "https://omadia.ai"
+  license: "MIT"
+  categories:
+    - "llm-provider"
+    - "infrastructure"
+
+compat:
+  core: ">=1.0 <2.0"
+  node: ">=20"
+
+lifecycle:
+  entry: "dist/plugin.js"
+
+# Declarative LLM-provider contribution. The kernel reads this block at
+# manifest-load (before any plugin activates) and registers MiniMax into the
+# LlmProviderCatalog + the dynamic model overlay. The API key is set centrally
+# on the admin Providers page (vault key `provider:minimax/api_key`), exactly
+# like the built-in OpenAI provider — NOT via per-plugin setup secrets, because
+# the orchestrator reads the key from its own (shared) vault scope.
+llm_provider:
+  id: "minimax"
+  label: "MiniMax"
+  wire_format: "openai-compatible"
+  # International endpoint. Operators in China override via the setup field
+  # `minimax_base_url` → https://api.minimaxi.com/v1
+  default_base_url: "https://api.minimax.io/v1"
+  base_url_config_key: "minimax_base_url"
+  quirks:
+    # MiniMax deprecates `max_tokens`; the modern endpoint wants this field.
+    max_tokens_field: "max_completion_tokens"
+    # `tool_choice` / `parallel_tool_calls` are not in MiniMax's schema; sending
+    # them risks rejection. M3 decides tool use autonomously — drop them.
+    drop_tool_choice: true
+    # MiniMax can signal errors in `base_resp.status_code` even on HTTP 200.
+    check_base_resp: true
+    # Separate interleaved reasoning out of `content` instead of inlining
+    # <think>…</think> tags.
+    extra_body:
+      reasoning_split: true
+  models:
+    - id: "minimax:MiniMax-M3"
+      model_id: "MiniMax-M3"
+      label: "MiniMax M3"
+      class: "frontier"
+      max_tokens: 131072
+      context_window: 1048576
+      vision: true
+      class_default: true
+    - id: "minimax:MiniMax-M2.5"
+      model_id: "MiniMax-M2.5"
+      label: "MiniMax M2.5"
+      class: "balanced"
+      max_tokens: 65536
+      context_window: 204800
+      vision: false
+    - id: "minimax:MiniMax-M2.5-highspeed"
+      model_id: "MiniMax-M2.5-highspeed"
+      label: "MiniMax M2.5 (high-speed)"
+      class: "fast"
+      max_tokens: 65536
+      context_window: 204800
+      vision: false
+
+setup:
+  fields:
+    - key: "minimax_base_url"
+      type: "url"
+      label: "MiniMax Base-URL (Region)"
+      help: "International: https://api.minimax.io/v1 — China: https://api.minimaxi.com/v1"
+      required: false
+      default: "https://api.minimax.io/v1"
+
+playbook:
+  when_to_use: |
+    Installiere diesen Provider, um MiniMax-Modelle (M3 / M2.5) als
+    Orchestrator-/Sub-Agent-/Verifier-LLM auszuwählen. Nach der Installation
+    den API-Key auf der Admin-Providers-Seite hinterlegen und MiniMax dem
+    gewünschten Plugin (z.B. Orchestrator) zuweisen.
+
+permissions:
+  memory:
+    reads: []
+    writes: []
+  graph:
+    reads: []
+    writes: []
+  network:
+    outbound:
+      - "api.minimax.io"
+      - "api.minimaxi.com"
+  filesystem:
+    scratch: false
+
+integrations: []
