@@ -3,7 +3,7 @@ schema_version: "1"
 identity:
   id: "@omadia/plugin-llm-minimax"
   name: "MiniMax LLM Provider"
-  version: "0.1.0"
+  version: "0.2.0"
   # 'extension' = cross-cutting capability (valid manifest kind). The LLM provider
   # itself is contributed declaratively via the `llm_provider` block below, which
   # the omadia kernel registers regardless of kind.
@@ -52,6 +52,24 @@ llm_provider:
     # <think>…</think> tags.
     extra_body:
       reasoning_split: true
+  # models is the offline seed; discovery rules must never name a version.
+  # Claim highspeed variants first; the newest plain M-family match is frontier,
+  # while older generations fall back to balanced via rest_class.
+  discovery:
+    include:
+      - "^MiniMax-M\\d"
+    classify:
+      - match: "-highspeed$"
+        class: "fast"
+        max_tokens: 65536
+        context_window: 204800
+        vision: false
+      - match: "^MiniMax-M\\d+(\\.\\d+)?$"
+        class: "frontier"
+        rest_class: "balanced"
+        max_tokens: 131072
+        context_window: 1048576
+        vision: true
   models:
     - id: "minimax:MiniMax-M3"
       model_id: "MiniMax-M3"
@@ -61,16 +79,16 @@ llm_provider:
       context_window: 1048576
       vision: true
       class_default: true
-    - id: "minimax:MiniMax-M2.5"
-      model_id: "MiniMax-M2.5"
-      label: "MiniMax M2.5"
+    - id: "minimax:MiniMax-M2.7"
+      model_id: "MiniMax-M2.7"
+      label: "MiniMax M2.7"
       class: "balanced"
       max_tokens: 65536
       context_window: 204800
       vision: false
-    - id: "minimax:MiniMax-M2.5-highspeed"
-      model_id: "MiniMax-M2.5-highspeed"
-      label: "MiniMax M2.5 (high-speed)"
+    - id: "minimax:MiniMax-M2.7-highspeed"
+      model_id: "MiniMax-M2.7-highspeed"
+      label: "MiniMax M2.7 (high-speed)"
       class: "fast"
       max_tokens: 65536
       context_window: 204800
@@ -87,7 +105,7 @@ setup:
 
 playbook:
   when_to_use: |
-    Installiere diesen Provider, um MiniMax-Modelle (M3 / M2.5) als
+    Installiere diesen Provider, um MiniMax-Modelle (M3 / M2.7) als
     Orchestrator-/Sub-Agent-/Verifier-LLM auszuwählen. Nach der Installation
     den API-Key auf der Admin-Providers-Seite hinterlegen und MiniMax dem
     gewünschten Plugin (z.B. Orchestrator) zuweisen.

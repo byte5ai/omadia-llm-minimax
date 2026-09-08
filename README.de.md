@@ -25,8 +25,8 @@ omadia ist ein selbst-hostbares agentisches OS: stelle Multi-Agent-Teams aus sig
 | Modell | Klasse | Kontext |
 | --- | --- | --- |
 | MiniMax M3 | frontier | 1.048.576 |
-| MiniMax M2.5 | balanced | 204.800 |
-| MiniMax M2.5 (high-speed) | fast | 204.800 |
+| MiniMax M2.7 | balanced | 204.800 |
+| MiniMax M2.7 (high-speed) | fast | 204.800 |
 
 Agenten fragen eine Klasse an (`fast`, `balanced`, `frontier`). omadia bildet die Klasse auf das Modell ab, ein Agent nennt also nie ein festes Modell.
 
