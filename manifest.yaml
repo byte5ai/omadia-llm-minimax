@@ -3,11 +3,10 @@ schema_version: "1"
 identity:
   id: "@omadia/plugin-llm-minimax"
   name: "MiniMax LLM Provider"
-  version: "0.2.0"
-  # 'extension' = cross-cutting capability (valid manifest kind). The LLM provider
-  # itself is contributed declaratively via the `llm_provider` block below, which
-  # the omadia kernel registers regardless of kind.
-  kind: "extension"
+  version: "0.3.0"
+  # Model plugin (kind `model`): only the kernel's model gateway calls it. The provider
+  # is contributed declaratively via the `llm_provider` block below.
+  kind: "model"
   domain: "llm.provider.minimax"
   description: "Macht MiniMax (Flagship MiniMax-M3, 1M-Kontext) als admin-wählbaren, OpenAI-kompatiblen LLM-Provider in omadia verfügbar. Deklarativer Provider — wird aus diesem Manifest registriert, ohne Laufzeit-Provider-Code."
   authors:
@@ -20,7 +19,7 @@ identity:
     - "infrastructure"
 
 compat:
-  core: ">=1.0 <2.0"
+  core: ">=1.78.0 <2.0"
   node: ">=20"
 
 lifecycle:
@@ -121,6 +120,8 @@ permissions:
     outbound:
       - "api.minimax.io"
       - "api.minimaxi.com"
+      # Operator-configured base URL (proxy/gateway/remote); the kernel allows its host.
+      - "$config.minimax_base_url"
   filesystem:
     scratch: false
 

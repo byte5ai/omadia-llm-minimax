@@ -32,7 +32,7 @@ Agents ask for a class (`fast`, `balanced`, `frontier`). omadia maps the class t
 
 ## How it works in omadia
 
-A declarative provider plugin, so it ships no runtime provider code. The omadia kernel reads the `llm_provider` block from `manifest.yaml` when the plugin loads, before any agent activates, and registers it in the provider catalog. MiniMax speaks an OpenAI-compatible wire format, so omadia drives it through its built-in OpenAI-compatible adapter. The manifest declares MiniMax's wire quirks (the modern `max_completion_tokens` field, the reasoning split) so requests stay valid.
+A model plugin (kind `model`); only the kernel's model gateway calls it. It is a declarative provider plugin, so it ships no runtime provider code. The omadia kernel reads the `llm_provider` block from `manifest.yaml` when the plugin loads, before any agent activates, and registers it in the provider catalog. MiniMax speaks an OpenAI-compatible wire format, so omadia drives it through its built-in OpenAI-compatible adapter. The manifest declares MiniMax's wire quirks (the modern `max_completion_tokens` field, the reasoning split) so requests stay valid.
 
 ## Install
 

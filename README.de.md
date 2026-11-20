@@ -32,7 +32,7 @@ Agenten fragen eine Klasse an (`fast`, `balanced`, `frontier`). omadia bildet di
 
 ## So funktioniert es in omadia
 
-Ein deklaratives Provider-Plugin, es bringt also keinen Laufzeit-Code mit. Der omadia-Kernel liest beim Laden den `llm_provider`-Block aus `manifest.yaml`, bevor ein Agent aktiviert wird, und registriert ihn im Provider-Katalog. MiniMax spricht ein OpenAI-kompatibles Wire-Format, also fährt omadia es über den eingebauten OpenAI-kompatiblen Adapter. Das Manifest deklariert die MiniMax-Wire-Eigenheiten (das moderne Feld `max_completion_tokens`, den Reasoning-Split), damit Requests gültig bleiben.
+Ein Modell-Plugin (Kind `model`); nur das Modell-Gateway des Kernels ruft es auf. Es ist ein deklaratives Provider-Plugin, es bringt also keinen Laufzeit-Code mit. Der omadia-Kernel liest beim Laden den `llm_provider`-Block aus `manifest.yaml`, bevor ein Agent aktiviert wird, und registriert ihn im Provider-Katalog. MiniMax spricht ein OpenAI-kompatibles Wire-Format, also fährt omadia es über den eingebauten OpenAI-kompatiblen Adapter. Das Manifest deklariert die MiniMax-Wire-Eigenheiten (das moderne Feld `max_completion_tokens`, den Reasoning-Split), damit Requests gültig bleiben.
 
 ## Installation
 
